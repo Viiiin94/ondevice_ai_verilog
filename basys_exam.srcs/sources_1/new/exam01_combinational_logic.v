@@ -171,17 +171,92 @@ module encoder_4_2(
     input [3:0] signal,
     output reg [1:0] code);
     
+    // 삼항연산자로 간단하게 풀이
 //    assign code = (signal == 4'b0001) ? 2'b00 :
 //                  (signal == 4'b0010) ? 2'b01 :
 //                  (signal == 4'b0100) ? 2'b10 : 2'b11;
 
-    always @(signal)begin
-        if(signal == 4'b0001) code = 2'b00;
-        else if(signal == 4'b0010) code = 2'b01;
-        else if(signal == 4'b0100) code = 2'b10;
-        else if(signal == 4'b1000) code = 2'b11;
-    end
-                  
+    // if문은 반드시 always 안에서
+    // 베릴로그에선 else가 반드시 필요함
+    // 입력 값이 단 하나라도 정의가 반드시 필요함 ex) 여기선 각 하나의 비트만 받았음 나머지 동시에 비트가 들어올 때에 대한 else
+//    always @(signal)begin
+//        if(signal == 4'b0001) code = 2'b00;
+//        else if(signal == 4'b0010) code = 2'b01;
+//        else if(signal == 4'b0100) code = 2'b10;
+//        else if(signal == 4'b1000) code = 2'b11;
+//        else code = 2'b11;
+//    end
+
+     always @(signal)begin
+     // 각 case별 1문장으로 하면 begin ... end 생략 가
+        case({signal})
+            4'b0001: code = 2'b00;
+            4'b0010: code = 2'b01;
+            4'b0100: code = 2'b10;
+            4'b1000: code = 2'b11;
+            default: code = 2'b11; // default는 모든 경우의 조건이 있으면 생략 가능
+        endcase
+     end
+                 
+endmodule
+
+
+module decoder_2_4(
+    input [1:0] code,
+    output [3:0] signal);
+    
+    assign signal = (code == 2'b00) ? 4'b0001 :
+                    (code == 2'b01) ? 4'b0010 :
+                    (code == 2'b10) ? 4'b0100 : 4'b1000;
+    
+    
+endmodule
+
+module mux_2_1(
+    input [1:0] d,
+    input s,
+    output f);
+
+    assign f = s ? d[1] : d[0];
+    // assign f = d[s]; 이렇게 사용 가능 이 2개의 문법이 mux 그 자체임
+
+endmodule
+
+module mux_4_1(
+    input [3:0] d,
+    input [1:0] s,
+    output f);
+
+    assign f = d[s];
+
+endmodule
+
+module mux_8_1(
+    input [7:0] d,
+    input [2:0] s,
+    output f);
+
+    assign f = d[s];
+
+endmodule
+
+
+module demux_1_4(
+    input d,
+    input [1:2] s,
+    output [3:0] f);
+    
+    // 4개의 MUX?????
+//    assign f[0] = (s == 2'b00) ? d : 0;
+//    assign f[1] = (s == 2'b01) ? d : 0;
+//    assign f[2] = (s == 2'b10) ? d : 0;
+//    assign f[3] = (s == 2'b11) ? d : 0;
+
+    // 베릴로그에서 {} << 는 비트를 합칠 때 (비트 결합 연산자) 아래는 4비트가 됨
+    assign f = (s == 2'b00) ? {3'b000, d} :
+               (s == 2'b00) ? {2'b00, d, 1'b0} :
+               (s == 2'b00) ? {1'b0, d, 2'b00} : {d, 3'b000};
+
 endmodule
 
 

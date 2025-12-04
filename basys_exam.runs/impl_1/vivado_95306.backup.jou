@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2024.2 (64-bit)
+# SW Build 5239630 on Fri Nov 08 22:34:34 MST 2024
+# IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
+# SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
+# Start of session at: Thu Dec  4 10:24:35 2025
+# Process ID         : 95306
+# Current directory  : /media/user23/data/workspace/basys_exam/basys_exam.runs/impl_1
+# Command line       : vivado -log mux_4_1.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source mux_4_1.tcl -notrace
+# Log file           : /media/user23/data/workspace/basys_exam/basys_exam.runs/impl_1/mux_4_1.vdi
+# Journal file       : /media/user23/data/workspace/basys_exam/basys_exam.runs/impl_1/vivado.jou
+# Running On         : user23-B80KV-AP35BKE
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 24.04.3 LTS
+# Processor Detail   : 13th Gen Intel(R) Core(TM) i5-13400
+# CPU Frequency      : 803.292 MHz
+# CPU Physical cores : 10
+# CPU Logical cores  : 16
+# Host memory        : 16497 MB
+# Swap memory        : 32000 MB
+# Total Virtual      : 48498 MB
+# Available Virtual  : 44185 MB
+#-----------------------------------------------------------
+source mux_4_1.tcl -notrace

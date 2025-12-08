@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="synth_1" LaunchPart="xc7a35tcpg236-1" LaunchTime="1764918437" LaunchIncrCheckpoint="$PSRCDIR/utils_1/imports/synth_1/test_top.dcp">
-  <File Type="VDS-TIMINGSUMMARY" Name="T_flip_flop_n_timing_summary_synth.rpt"/>
-  <File Type="RDS-DCP" Name="T_flip_flop_n.dcp"/>
-  <File Type="RDS-UTIL-PB" Name="T_flip_flop_n_utilization_synth.pb"/>
-  <File Type="RDS-UTIL" Name="T_flip_flop_n_utilization_synth.rpt"/>
-  <File Type="RDS-PROPCONSTRS" Name="T_flip_flop_n_drc_synth.rpt"/>
-  <File Type="RDS-RDS" Name="T_flip_flop_n.vds"/>
-  <File Type="REPORTS-TCL" Name="T_flip_flop_n_reports.tcl"/>
-  <File Type="VDS-TIMING-PB" Name="T_flip_flop_n_timing_summary_synth.pb"/>
-  <File Type="PA-TCL" Name="T_flip_flop_n.tcl"/>
+<GenRun Id="synth_1" LaunchPart="xc7a35tcpg236-1" LaunchTime="1765174558" LaunchIncrCheckpoint="$PSRCDIR/utils_1/imports/synth_1/test_top.dcp">
+  <File Type="VDS-TIMINGSUMMARY" Name="ring_counter_led_timing_summary_synth.rpt"/>
+  <File Type="RDS-DCP" Name="ring_counter_led.dcp"/>
+  <File Type="RDS-UTIL-PB" Name="ring_counter_led_utilization_synth.pb"/>
+  <File Type="RDS-UTIL" Name="ring_counter_led_utilization_synth.rpt"/>
+  <File Type="RDS-PROPCONSTRS" Name="ring_counter_led_drc_synth.rpt"/>
+  <File Type="RDS-RDS" Name="ring_counter_led.vds"/>
+  <File Type="REPORTS-TCL" Name="ring_counter_led_reports.tcl"/>
+  <File Type="VDS-TIMING-PB" Name="ring_counter_led_timing_summary_synth.pb"/>
+  <File Type="PA-TCL" Name="ring_counter_led.tcl"/>
   <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
     <Filter Type="Srcs"/>
     <File Path="$PSRCDIR/sources_1/new/exam02_sequential_logic.v">
@@ -36,7 +36,7 @@
     </File>
     <Config>
       <Option Name="DesignMode" Val="RTL"/>
-      <Option Name="TopModule" Val="T_flip_flop_n"/>
+      <Option Name="TopModule" Val="ring_counter_led"/>
     </Config>
   </FileSet>
   <FileSet Name="constrs_in" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1" RelGenDir="$PGENDIR/constrs_1">

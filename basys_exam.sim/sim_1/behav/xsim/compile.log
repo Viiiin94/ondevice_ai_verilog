@@ -1,3 +1,14 @@
 INFO: [VRFC 10-2263] Analyzing Verilog file "/media/user23/data/workspace/basys_exam/basys_exam.srcs/sources_1/new/exam02_sequential_logic.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module D_flip_flop_n
 INFO: [VRFC 10-311] analyzing module D_flip_flop_p
+INFO: [VRFC 10-311] analyzing module T_flip_flop_n
+INFO: [VRFC 10-311] analyzing module T_flip_flop_p
+INFO: [VRFC 10-311] analyzing module up_counter_asyc
+INFO: [VRFC 10-311] analyzing module down_counter_asyc
+INFO: [VRFC 10-311] analyzing module up_counter_p
+INFO: [VRFC 10-311] analyzing module down_counter_p
+INFO: [VRFC 10-311] analyzing module down_counter_n
+INFO: [VRFC 10-311] analyzing module ring_counter
+INFO: [VRFC 10-311] analyzing module ring_counter_shift
+INFO: [VRFC 10-311] analyzing module ring_counter_led
+INFO: [VRFC 10-311] analyzing module edge_detector_n

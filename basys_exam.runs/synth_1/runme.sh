@@ -37,4 +37,4 @@ EAStep()
      fi
 }
 
-EAStep vivado -log D_flip_flop_p.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source D_flip_flop_p.tcl
+EAStep vivado -log T_flip_flop_n.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source T_flip_flop_n.tcl

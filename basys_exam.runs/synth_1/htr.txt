@@ -7,4 +7,4 @@
 # Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 #
 
-vivado -log D_flip_flop_p.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source D_flip_flop_p.tcl
+vivado -log T_flip_flop_n.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source T_flip_flop_n.tcl

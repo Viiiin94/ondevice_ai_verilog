@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="synth_1" LaunchPart="xc7a35tcpg236-1" LaunchTime="1764833976" LaunchIncrCheckpoint="$PSRCDIR/utils_1/imports/synth_1/test_top.dcp">
-  <File Type="VDS-TIMINGSUMMARY" Name="D_flip_flop_p_timing_summary_synth.rpt"/>
-  <File Type="RDS-DCP" Name="D_flip_flop_p.dcp"/>
-  <File Type="RDS-UTIL-PB" Name="D_flip_flop_p_utilization_synth.pb"/>
-  <File Type="RDS-UTIL" Name="D_flip_flop_p_utilization_synth.rpt"/>
-  <File Type="RDS-PROPCONSTRS" Name="D_flip_flop_p_drc_synth.rpt"/>
-  <File Type="RDS-RDS" Name="D_flip_flop_p.vds"/>
-  <File Type="REPORTS-TCL" Name="D_flip_flop_p_reports.tcl"/>
-  <File Type="VDS-TIMING-PB" Name="D_flip_flop_p_timing_summary_synth.pb"/>
-  <File Type="PA-TCL" Name="D_flip_flop_p.tcl"/>
+<GenRun Id="synth_1" LaunchPart="xc7a35tcpg236-1" LaunchTime="1764918437" LaunchIncrCheckpoint="$PSRCDIR/utils_1/imports/synth_1/test_top.dcp">
+  <File Type="VDS-TIMINGSUMMARY" Name="T_flip_flop_n_timing_summary_synth.rpt"/>
+  <File Type="RDS-DCP" Name="T_flip_flop_n.dcp"/>
+  <File Type="RDS-UTIL-PB" Name="T_flip_flop_n_utilization_synth.pb"/>
+  <File Type="RDS-UTIL" Name="T_flip_flop_n_utilization_synth.rpt"/>
+  <File Type="RDS-PROPCONSTRS" Name="T_flip_flop_n_drc_synth.rpt"/>
+  <File Type="RDS-RDS" Name="T_flip_flop_n.vds"/>
+  <File Type="REPORTS-TCL" Name="T_flip_flop_n_reports.tcl"/>
+  <File Type="VDS-TIMING-PB" Name="T_flip_flop_n_timing_summary_synth.pb"/>
+  <File Type="PA-TCL" Name="T_flip_flop_n.tcl"/>
   <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
     <Filter Type="Srcs"/>
     <File Path="$PSRCDIR/sources_1/new/exam02_sequential_logic.v">
@@ -36,7 +36,7 @@
     </File>
     <Config>
       <Option Name="DesignMode" Val="RTL"/>
-      <Option Name="TopModule" Val="D_flip_flop_p"/>
+      <Option Name="TopModule" Val="T_flip_flop_n"/>
     </Config>
   </FileSet>
   <FileSet Name="constrs_in" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1" RelGenDir="$PGENDIR/constrs_1">
@@ -68,9 +68,7 @@
     </Config>
   </FileSet>
   <Strategy Version="1" Minor="2">
-    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2024">
-      <Desc>Vivado Synthesis Defaults</Desc>
-    </StratHandle>
+    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2024"/>
     <Step Id="synth_design"/>
   </Strategy>
 </GenRun>

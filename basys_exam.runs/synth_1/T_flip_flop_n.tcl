@@ -4,7 +4,7 @@
 
 set TIME_start [clock seconds] 
 namespace eval ::optrace {
-  variable script "/media/user23/data/workspace/basys_exam/basys_exam.runs/synth_1/D_flip_flop_p.tcl"
+  variable script "/media/user23/data/workspace/basys_exam/basys_exam.runs/synth_1/T_flip_flop_n.tcl"
   variable category "vivado_synth"
 }
 
@@ -57,8 +57,7 @@ if {$::dispatch::connected} {
 
 OPTRACE "synth_1" START { ROLLUP_AUTO }
 set_param checkpoint.writeSynthRtdsInDcp 1
-set_param chipscope.maxJobs 4
-set_param xicom.use_bs_reader 1
+set_param synth.incrementalSynthesisCache /tmp/.Xil_user23/Vivado-7187-user23-B80KV-AP35BKE/incrSyn
 set_msg_config -id {Synth 8-256} -limit 10000
 set_msg_config -id {Synth 8-638} -limit 10000
 OPTRACE "Creating in-memory project" START { }
@@ -96,7 +95,7 @@ read_checkpoint -auto_incremental -incremental /media/user23/data/workspace/basy
 close [open __synthesis_is_running__ w]
 
 OPTRACE "synth_design" START { }
-synth_design -top D_flip_flop_p -part xc7a35tcpg236-1
+synth_design -top T_flip_flop_n -part xc7a35tcpg236-1
 OPTRACE "synth_design" END { }
 if { [get_msg_config -count -severity {CRITICAL WARNING}] > 0 } {
  send_msg_id runtcl-6 info "Synthesis results are not added to the cache due to CRITICAL_WARNING"
@@ -106,10 +105,10 @@ if { [get_msg_config -count -severity {CRITICAL WARNING}] > 0 } {
 OPTRACE "write_checkpoint" START { CHECKPOINT }
 # disable binary constraint mode for synth run checkpoints
 set_param constraints.enableBinaryConstraints false
-write_checkpoint -force -noxdef D_flip_flop_p.dcp
+write_checkpoint -force -noxdef T_flip_flop_n.dcp
 OPTRACE "write_checkpoint" END { }
 OPTRACE "synth reports" START { REPORT }
-generate_parallel_reports -reports { "report_utilization -file D_flip_flop_p_utilization_synth.rpt -pb D_flip_flop_p_utilization_synth.pb"  } 
+generate_parallel_reports -reports { "report_utilization -file T_flip_flop_n_utilization_synth.rpt -pb T_flip_flop_n_utilization_synth.pb"  } 
 OPTRACE "synth reports" END { }
 file delete __synthesis_is_running__
 close [open __synthesis_is_complete__ w]

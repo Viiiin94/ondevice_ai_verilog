@@ -39,6 +39,6 @@ EAStep()
 
 # pre-commands:
 /bin/touch .init_design.begin.rst
-EAStep vivado -log ring_counter_led.vdi -applog -m64 -product Vivado -messageDb vivado.pb -mode batch -source ring_counter_led.tcl -notrace
+EAStep vivado -log FND_top.vdi -applog -m64 -product Vivado -messageDb vivado.pb -mode batch -source FND_top.tcl -notrace
 
 

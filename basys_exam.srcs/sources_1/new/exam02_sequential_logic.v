@@ -187,7 +187,7 @@ module ring_counter_led(
     reg [31:0] clk_div;
     always @(posedge clk) clk_div = clk_div + 1;
 
-    wire clk_div22_ed_p, clk_div22_ed_n;
+    wire clk_div22_ed_p;
 
     edge_detector_n edn(.clk(clk), .reset(reset), .cp(clk_div[22]), .p_edge(clk_div22_ed_p));
     

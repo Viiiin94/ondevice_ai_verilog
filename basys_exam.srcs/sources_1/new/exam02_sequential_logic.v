@@ -240,4 +240,53 @@ module edge_detector_n(
 
 endmodule
 
+module SISO(
+    input clk, reset_p,
+    input d,
+    input en,
+    output f
+);
+
+    reg [7:0] register_siso;
+    always @(posedge clk, posedge reset_p)begin
+        if(reset_p) register_siso <= 0;
+        else if(en) begin  
+            register_siso <= {d, register_siso[7:1]};
+        end
+    end
+
+    assign f = register_siso[0];
+
+endmodule
+
+module SIPO(
+    input clk, reset_p,
+    input d,
+    input rd_en,
+    output [7:0] q
+);
+
+    reg [7:0] register_sipo;
+    always @(posedge clk, posedge reset_p) begin
+        if(reset_p)register_sipo = 0;
+        else register_sipo <= {d, register_sipo[7:1]};
+    end
+    
+    assign q = rd_en ? register_sipo : 8'bz; // 임피던스 
+
+endmodule
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -45,6 +45,62 @@ module FND_top(
 endmodule
 
 
+module watch_top(
+    input clk, reset_p,
+    input [3:0] button,
+    output [7:0] seg,
+    output [3:0] com
+);
+
+    
+    wire [2:0] btn_pedge, btn_nedge;
+    button_ctr btnctr0(
+    .clk(clk),
+    .reset_p(reset_p),
+    .btn(button[0]),
+    .btn_pedge(btn_pedge[0]),
+    .btn_nedge(btn_nedge[0])
+    );
+    button_ctr btnctr1(
+    .clk(clk),
+    .reset_p(reset_p),
+    .btn(button[1]),
+    .btn_pedge(btn_pedge[1]),
+    .btn_nedge(btn_nedge[1])
+    );
+    button_ctr btnctr2(
+    .clk(clk),
+    .reset_p(reset_p),
+    .btn(button[2]),
+    .btn_pedge(btn_pedge[2]),
+    .btn_nedge(btn_nedge[2])
+    );
+
+    wire [7:0] sec, min;
+    watch watch0(
+    .clk(clk),
+    .reset_p(reset_p),
+    .btn(btn_pedge),
+    .sec(sec),
+    .min(min));
+    
+    wire [7:0] sec_bcd, min_bcd;
+    bin_to_dec btd_sec(
+    .bin(sec),
+    .bcd(sec_bcd));
+    
+    bin_to_dec btd_min(
+    .bin(min),
+    .bcd(min_bcd));
+                 
+    FND_ctr fnd(
+    .clk(clk),
+    .reset_p(reset_p),
+    .fnd_value({min_bcd, sec_bcd}),
+    .seg(seg),
+    .com(com));
+
+endmodule
 
 
 

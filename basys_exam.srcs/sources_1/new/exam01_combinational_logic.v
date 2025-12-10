@@ -288,6 +288,65 @@ module seg_decoder(
 
 endmodule
 
+module bin_to_dec(
+    input [11:0] bin,
+    output reg [15:0] bcd
+);
+
+    integer i;
+    always @(bin)begin
+        bcd = 0;
+        for(i=0; i<12; i=i+1)begin
+            if(bcd[3:0] >= 5) bcd[3:0] = bcd[3:0] + 3;
+            if(bcd[7:4] >= 5) bcd[7:4] = bcd[7:4] + 3;
+            if(bcd[11:8] >= 5) bcd[11:8] = bcd[11:8] + 3;
+            if(bcd[15:12] >= 5) bcd[15:12] = bcd[15:12] + 3;
+            bcd = {bcd[14:0], bin[11-i]};
+        end
+    end
+
+endmodule
+
+module button_ctr(
+    input clk, reset_p,
+    input btn,
+    output btn_pedge, btn_nedge
+);
+
+    reg [15:0] cnt_sysclk;
+    reg debounced_btn;
+    always @(posedge clk, posedge reset_p)begin
+        if(reset_p) begin
+            cnt_sysclk = 0;
+            debounced_btn = 0;
+        end
+        else begin
+            if(cnt_sysclk[15])begin
+                debounced_btn = btn;
+                cnt_sysclk = 0;
+            end 
+            cnt_sysclk = cnt_sysclk + 1;
+        end
+    end
+
+    edge_detector_n(
+    .clk(clk),
+    .reset(reset_p),
+    .cp(debounced_btn),
+    .p_edge(btn_pedge),
+    .n_edge(btn_nedge)
+);
+
+endmodule
+
+
+
+
+
+
+
+
+
 
 
 

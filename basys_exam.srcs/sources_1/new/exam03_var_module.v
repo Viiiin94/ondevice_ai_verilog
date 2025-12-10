@@ -73,3 +73,93 @@ module watch(
         end
     end
 endmodule
+
+module cook_timer(
+    input clk, reset_p,
+    input btn_start, inc_sec, inc_min, alarm_off,
+    output reg [7:0] sec, min, 
+    output reg alarm
+);
+
+    reg prev;
+    wire btn_rise;
+    // 핵심 포인트 새로운 펄스 검출기를 넣어 reg가 서로다른 always(flipflop)에서 값을 넣지 않게
+    always @(posedge clk) prev <= btn_start;
+    assign btn_rise = btn_start && ~prev;
+
+    reg [7:0] set_sec, set_min;
+    reg dcnt_set;
+    always @(posedge clk, posedge reset_p) begin
+        if(reset_p) begin
+            dcnt_set <= 0;
+            alarm <= 0;
+        end
+        else begin
+            if(btn_start) begin
+                dcnt_set <= ~dcnt_set;
+            end
+
+            if(sec == 0 && min == 0 && dcnt_set)begin
+                dcnt_set <= 0;
+                alarm <= 1;
+            end
+
+            if(alarm_off || inc_sec || inc_min || btn_rise) alarm <= 0;
+        end
+    end
+
+    integer cnt_sysclk;
+
+    always @(posedge clk, posedge reset_p) begin
+        if(reset_p) begin
+            cnt_sysclk <= 0;
+            sec <= 0; min <= 0;
+            set_sec <= 8'b0001_1110;
+            set_min <= 8'b0000_0011;
+        end
+        else begin
+            if(btn_rise && sec == 0 && min == 0) begin
+                sec <= set_sec;
+                min <= set_min;
+            end
+        
+            if(dcnt_set) begin
+                if(cnt_sysclk >= 99_999_999)begin
+                     cnt_sysclk <= 0;
+                     if(sec == 0 && min)begin
+                        sec <= 59;
+                        min <= min - 1;
+                     end
+                     else sec <= sec - 1;
+                end
+                else cnt_sysclk <= cnt_sysclk + 1;
+            end
+            else begin
+                if(inc_sec) begin
+                    if(sec >= 59) sec <= 0;
+                    sec <= sec + 1;
+                end
+                if(inc_min) begin
+                    if(min >= 59) min <= 0;
+                    min <= min + 1;
+                end
+            end
+        end
+    end
+
+endmodule
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

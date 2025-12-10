@@ -1,0 +1,7 @@
+Running: xsim.dir/tb_PISO_behav/xsimk -simmode gui -wdb tb_PISO_behav.wdb -simrunnum 0 -socket 43599
+Design successfully loaded
+Design Loading Memory Usage: 181632 KB (Peak: 181688 KB)
+Design Loading CPU Usage: 670 ms
+Simulation completed
+Simulation Memory Usage: 263368 KB (Peak: 320900 KB)
+Simulation CPU Usage: 670 ms

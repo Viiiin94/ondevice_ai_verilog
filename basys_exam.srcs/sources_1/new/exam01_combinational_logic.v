@@ -313,7 +313,7 @@ module button_ctr(
     output btn_pedge, btn_nedge
 );
 
-    reg [15:0] cnt_sysclk;
+    reg [21:0] cnt_sysclk;
     reg debounced_btn;
     always @(posedge clk, posedge reset_p)begin
         if(reset_p) begin
@@ -321,7 +321,7 @@ module button_ctr(
             debounced_btn = 0;
         end
         else begin
-            if(cnt_sysclk[15])begin
+            if(cnt_sysclk[20])begin
                 debounced_btn = btn;
                 cnt_sysclk = 0;
             end 

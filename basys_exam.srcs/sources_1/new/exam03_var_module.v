@@ -86,8 +86,7 @@ module cook_timer(
     // 핵심 포인트 새로운 펄스 검출기를 넣어 reg가 서로다른 always(flipflop)에서 값을 넣지 않게
     always @(posedge clk) prev <= btn_start;
     assign btn_rise = btn_start && ~prev;
-
-    reg [7:0] set_sec, set_min;
+    
     reg dcnt_set;
     always @(posedge clk, posedge reset_p) begin
         if(reset_p) begin
@@ -109,18 +108,18 @@ module cook_timer(
     end
 
     integer cnt_sysclk;
-
+    reg [7:0] set_sec, set_min;
     always @(posedge clk, posedge reset_p) begin
         if(reset_p) begin
             cnt_sysclk <= 0;
             sec <= 0; min <= 0;
-            set_sec <= 8'b0001_1110;
-            set_min <= 8'b0000_0011;
+            set_sec <= 0;
+            set_min <= 0;
         end
         else begin
-            if(btn_rise && sec == 0 && min == 0) begin
-                sec <= set_sec;
-                min <= set_min;
+            if(alarm_off && sec == 0 && min == 0) begin
+                set_sec <= sec;
+                set_min <= min;
             end
         
             if(dcnt_set) begin

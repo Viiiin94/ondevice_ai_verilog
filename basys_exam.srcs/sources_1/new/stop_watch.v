@@ -19,7 +19,6 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
 module stop_watch_top(
     input clk, reset_p,
     input [3:0] button,
@@ -99,6 +98,9 @@ module stop_watch(
                 cnt_start <= ~cnt_start;
                 view_time <= ~view_time;
             end
+            else if(set_sec >= 59 && set_msec >= 99) begin // 59.99가 되면 스탑워치 정지
+                cnt_start <= 0; 
+            end
         end
     end
     
@@ -138,3 +140,4 @@ module stop_watch(
     assign msec = (view_time || save_msec == 0) ? set_msec : save_msec;
     
 endmodule
+

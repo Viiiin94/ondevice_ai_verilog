@@ -70,6 +70,90 @@ module FND_ctr(
 endmodule
 
 
+module freq_generator(
+    input clk, reset_p,
+    output reg trans_cp
+);
+    
+    parameter FREQ = 1_000_000;
+    parameter SYS_FREQ = 100_000_000;
+    parameter HALF_PERIOD = SYS_FREQ / FREQ / 2 - 1;
+    
+    integer cnt;
+    always @(posedge clk, posedge reset_p)begin
+        if(reset_p) begin
+            cnt = 0;
+            trans_cp = 0;
+        end
+        else begin
+            // 100ns 주기를 갖게 하는 카운터(0 5번, 1 5번) // 1000ns는 49 
+            if(cnt >= HALF_PERIOD) begin
+                cnt = 0;
+                trans_cp = ~trans_cp;
+            end
+            else cnt = cnt + 1;
+        end
+    end
+endmodule
+
+module pwm_Nfreq_Nstep(
+    input clk, reset_p,
+    input [31:0] duty,
+    output reg pwm
+);
+
+    parameter SYS_CLK_FREQ = 100_000_000;
+    parameter PWM_FREQ = 10_000;
+    parameter DUTY_STEP = 200;
+    parameter TEMP = SYS_CLK_FREQ / (PWM_FREQ * DUTY_STEP) / 2 - 1;
+    
+    integer cnt;
+    reg pwm_freqXstep;
+    always @(posedge clk, posedge reset_p) begin
+        if(reset_p) begin
+            cnt <= 0;
+            pwm_freqXstep <= 0;
+        end
+        else begin
+            if(cnt >= TEMP) begin
+                cnt <= 0;
+                pwm_freqXstep <= ~pwm_freqXstep;
+            end
+            else cnt <= cnt + 1;
+        end
+    end
+    
+    wire pwm_freqXstep_pedge;
+    
+    edge_detector_n edn(.clk(clk), .reset(reset_p), .cp(pwm_freqXstep), .p_edge(pwm_freqXstep_pedge));
+    integer cnt_duty;
+    always @(posedge clk, posedge reset_p) begin
+        if(reset_p) begin
+            cnt_duty <= 0;
+            pwm <= 0;
+        end
+        else if(pwm_freqXstep_pedge) begin
+            if(cnt_duty >= DUTY_STEP - 1) cnt_duty <= 0;
+            else cnt_duty <= cnt_duty + 1;
+            
+            if(cnt_duty < duty) pwm <= 1;
+            else pwm <= 0;
+        end
+    end
+
+endmodule
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

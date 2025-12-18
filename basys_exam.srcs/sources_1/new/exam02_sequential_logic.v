@@ -223,6 +223,31 @@ module edge_detector_n(
 
     reg ff_cur, ff_old;
 
+    always @(negedge clk, posedge reset)begin
+        if(reset)begin
+            ff_cur <= 0;
+            ff_old <= 0;
+        end
+        else begin
+        // '=' 블록킹 '<=' 논블록킹
+            ff_old <= ff_cur;
+            ff_cur <= cp;
+        end
+    end
+
+    assign p_edge = ({ff_cur, ff_old} == 2'b10) ? 1 : 0;
+    assign n_edge = ({ff_cur, ff_old} == 2'b01) ? 1 : 0;
+
+endmodule
+
+module edge_detector_p(
+    input clk, reset,
+    input cp,
+    output p_edge, n_edge
+);
+
+    reg ff_cur, ff_old;
+
     always @(posedge clk, posedge reset)begin
         if(reset)begin
             ff_cur <= 0;

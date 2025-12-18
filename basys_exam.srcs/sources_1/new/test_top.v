@@ -413,7 +413,26 @@ module ultra_sonic_top(
 
 endmodule
 
+module dht11_top(
+    input clk, reset_p,
+    inout dht11_data,
+    output [7:0] seg,
+    output [3:0] com,
+    output [15:0] led
+);
 
+    wire [7:0] humidity, temperature;
+    dht11_ctr dht(clk, reset_p, dht11_data, humidity, temperature, led);
+
+    wire [7:0] humidity_bcd, temperature_bcd;
+    bin_to_dec btd_humi(.bin(humidity), .bcd(humidity_bcd));
+    bin_to_dec btd_tmpr(.bin(temperature), .bcd(temperature_bcd));
+    
+    FND_ctr fnd(.clk(clk), .reset_p(reset_p),
+                .fnd_value({humidity_bcd, temperature_bcd}),
+                .seg(seg), .com(com)); 
+
+endmodule
 
 
 

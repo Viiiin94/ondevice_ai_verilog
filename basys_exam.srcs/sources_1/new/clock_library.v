@@ -42,7 +42,7 @@ module clock_usec(
         end
     end
 
-    edge_detector_n ed(.clk(clk), .reset(reset_p),
+    edge_detector_n ed(.clk(clk), .reset_p(reset_p),
                        .cp(clk_usec), .p_edge(clk_usec_pedge),
                        .n_edge(clk_usec_nedge));
     

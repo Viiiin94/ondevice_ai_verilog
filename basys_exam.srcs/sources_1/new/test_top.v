@@ -434,16 +434,343 @@ module dht11_top(
 
 endmodule
 
+module i2c_master_top(
+    input clk, reset_p, 
+    input sw, 
+    input comm_start,
+    output scl, sda,
+    output [15:0] led
+);
+    localparam light_on  = 8'b0000_1000;
+    localparam light_off = 8'b0000_0000;
+    
+    wire [7:0] data;
+    wire busy;
+    assign data = sw ? light_on : light_off;
+    
+    I2C_master i2c(clk, reset_p, 7'h27, data, 1'b0, comm_start, scl, sda, busy ,led);
+    
+endmodule
 
 
+module i2c_txtlcd_top(
+    input clk, reset_p,
+    input [3:0] button,
+    output scl, sda,
+    output [15:0] led     
+);
 
+    wire [3:0] btn_pedge;
+    button_ctr btnctr0(clk, reset_p, button[0], btn_pedge[0]);
+    button_ctr btnctr1(clk, reset_p, button[1], btn_pedge[1]);
+    button_ctr btnctr2(clk, reset_p, button[2], btn_pedge[2]);
+    button_ctr btnctr3(clk, reset_p, button[3], btn_pedge[3]);
+    
+    integer cnt_sysclk;
+    reg count_clk_e;
+    always @(negedge clk, posedge reset_p) begin
+        if(reset_p) begin
+            cnt_sysclk = 0;
+        end
+        else if(count_clk_e) begin
+            cnt_sysclk = cnt_sysclk + 1;
+        end
+        else begin
+            cnt_sysclk = 0;
+        end
+    end
+    
+    reg [7:0] send_buffer;
+    reg send, rs;
+    wire busy;
+    i2c_lcd_send_byte send_byte(clk, reset_p, 7'h27, send_buffer, send, rs,
+                                scl, sda, busy, led);
+                                
+    localparam IDLE                 = 6'b00_0001;
+    localparam INIT                 = 6'b00_0010;
+    localparam SEND_CHARACTER       = 6'b00_0100;
+    localparam SHIFT_RIGHT_DISPLAY  = 6'b00_1000;
+    localparam SHIFT_LEFT_DISPLAY   = 6'b01_0000;
+    
+    reg [5:0] state, next_state;
+    always @(negedge clk, posedge reset_p) begin
+        if(reset_p) begin
+            state = IDLE;
+        end
+        else begin
+            state = next_state;
+        end
+    end
+    
+    reg init_flag;
+    reg [10:0] cnt_data;
+    always @(posedge clk, posedge reset_p) begin
+        if(reset_p) begin
+            next_state = IDLE;
+            init_flag = 0;
+            cnt_data = 0;
+            count_clk_e = 0;
+            send = 0;
+            send_buffer = 0;
+            rs = 0;
+        end
+        else begin
+            case(state)
+                IDLE                : begin
+                    // before start, wait 40ms but, wait leisurely 80ms
+                    if(init_flag) begin
+                        if(btn_pedge[0]) begin
+                            next_state = SEND_CHARACTER;
+                        end
+                        if(btn_pedge[1]) begin
+                            next_state = SHIFT_LEFT_DISPLAY;
+                        end
+                        if(btn_pedge[2]) begin
+                            next_state = SHIFT_RIGHT_DISPLAY;
+                        end
+                    end
+                    else begin
+                        if(cnt_sysclk <= 8_000_000) begin
+                            count_clk_e = 1;    
+                        end
+                        else begin
+                            count_clk_e = 0;
+                            next_state = INIT;
+                        end
+                    end
+                end    
+                INIT                : begin
+                    if(busy) begin
+                        send = 0;
+                        if(cnt_data >= 6) begin
+                            cnt_data = 0;
+                            next_state = IDLE;
+                            init_flag = 1;
+                        end
+                    end
+                    else if(!send) begin
+                        case(cnt_data)
+                            0: send_buffer = 8'h33;
+                            1: send_buffer = 8'h32;
+                            2: send_buffer = 8'h28;
+                            3: send_buffer = 8'h0f;
+                            4: send_buffer = 8'h01;
+                            5: send_buffer = 8'h06;
+                        endcase
+                        send = 1;
+                        cnt_data = cnt_data + 1;
+                    end
+                end
+                SEND_CHARACTER      : begin
+                    if(busy) begin
+                        if(cnt_data >= 9) begin
+                            cnt_data = 0;
+                        end
+                        send = 0;
+                        next_state = IDLE;
+                    end
+                    else if(!send) begin
+                        rs = 1;
+                        send_buffer = "0" + cnt_data;
+                        send = 1;
+                        cnt_data = cnt_data + 1;
+                    end
+                
+                end
+                SHIFT_RIGHT_DISPLAY : begin
+                    if(busy) begin 
+                        send = 0;
+                        next_state = IDLE;
+                    end
+                    else if(!send) begin
+                        rs = 0;
+                        send_buffer = 8'h1C;
+                        send = 1;
+                    end
+                end
+                SHIFT_LEFT_DISPLAY  : begin
+                    if(busy) begin 
+                        send = 0;
+                        next_state = IDLE;
+                    end
+                    else if(!send) begin
+                        rs = 0;
+                        send_buffer = 8'h18;
+                        send = 1;
+                    end
+                end
+            endcase
+        end
+    end
 
+endmodule
 
+module three_led_top(
+    input clk, reset_p,
+    input [2:0] button,
+    output led_r, led_g, led_b,
+    output [15:0] led,
+    output [7:0] seg,
+    output [3:0] com
+);
 
+// 1. 모드 정의
+    localparam MODE_COLOR_CYCLE = 3'b001; // 버튼 0: 색상 자동 순환
+    localparam MODE_DIMMING     = 3'b010; // 버튼 1: 숨쉬기
+    localparam MODE_FAST_BLINK  = 3'b100; // 버튼 2: 빠르게 깜빡임
+    
+    reg [2:0] current_mode;
+    reg [1:0] color_sel;
 
+    wire [2:0] btn_pedge;
+    button_ctr btn_cycle(clk, reset_p, button[0], btn_pedge[0]);
+    button_ctr btn_dimming(clk, reset_p, button[1], btn_pedge[1]);
+    button_ctr btn_blink(clk, reset_p, button[2], btn_pedge[2]);
+    
+    always @(posedge clk or posedge reset_p) begin
+        if(reset_p) begin
+            current_mode <= MODE_COLOR_CYCLE;
+            color_sel <= 0; 
+        end
+        else begin
+            // [버튼 0] 색상 변경 (R->G->B->R...)
+            if (btn_pedge[0]) begin
+                if(color_sel >= 2) color_sel <= 0;
+                else color_sel <= color_sel + 1;
+            end
+            // [버튼 1] 서서히 켜졌다 꺼짐
+            else if (btn_pedge[1]) begin 
+                if (current_mode == MODE_DIMMING) begin
+                    current_mode <= MODE_COLOR_CYCLE; // 이미 켜져있으면 -> 끔 (기본모드 복귀)
+                end
+                else begin
+                    current_mode <= MODE_DIMMING;
+                end
+            end
+            // [버튼 2] 빠르게 깜빡
+            else if (btn_pedge[2]) begin 
+                // 이미 깜빡임 모드라면? -> 기본 모드(그냥 켜짐)로 복귀
+                if (current_mode == MODE_FAST_BLINK) begin
+                    current_mode <= MODE_COLOR_CYCLE;
+                end
+                // 아니라면? -> 깜빡임 모드 진입
+                else begin
+                    current_mode <= MODE_FAST_BLINK;
+                end
+            end
+        end
+    end
+    
+    reg [7:0] duty_count;
+    reg dimming_state;
+    reg [23:0] dimming_duty_count;
+    
+    always @(posedge clk or posedge reset_p) begin
+        if (reset_p) begin
+            duty_count <= 0;
+            dimming_state <= 0;
+            dimming_duty_count <= 0;
+        end
+        else begin
+            if (dimming_duty_count >= 24'd250_000) begin 
+                dimming_duty_count <= 0;
+                if (dimming_state == 0) begin // 밝아지는 중
+                    if (duty_count == 8'd255) dimming_state <= 1;
+                    else duty_count <= duty_count + 1;
+                end
+                else begin // 어두워지는 중
+                    if (duty_count == 8'd0) dimming_state <= 0;
+                    else duty_count <= duty_count - 1;
+                end
+            end
+            else begin
+                dimming_duty_count <= dimming_duty_count + 1;
+            end
+        end
+    end
+    
+    reg blink_on_off;
+    reg [23:0] blink_timer;
+    
+    always @(posedge clk or posedge reset_p) begin
+        if (reset_p) begin
+            blink_on_off <= 0;
+            blink_timer <= 0;
+        end
+        else begin
+            if (blink_timer >= 24'd5_000_000) begin 
+                blink_timer <= 0;
+                blink_on_off <= ~blink_on_off;
+            end
+            else begin
+                blink_timer <= blink_timer + 1;
+            end
+        end
+    end
+    
+    reg [7:0] r_duty, g_duty, b_duty;
+    always @(*) begin
+        r_duty = 0; g_duty = 0; b_duty = 0;
 
+        case(current_mode)
+            // 모드 1: 수동 색상 변경 (버튼 0)
+            MODE_COLOR_CYCLE: begin
+                case(color_sel)
+                    0: r_duty = 255; // Red
+                    1: g_duty = 255; // Green
+                    2: b_duty = 255; // Blue
+                    default: begin r_duty=0; g_duty=0; b_duty=0; end
+                endcase
+            end
 
+            // 모드 2: 숨쉬기 (버튼 1)
+            MODE_DIMMING: begin
+                case(color_sel)
+                    0: r_duty = duty_count; // Red
+                    1: g_duty = duty_count; // Green
+                    2: b_duty = duty_count; // Blue
+                    default: begin r_duty=0; g_duty=0; b_duty=0; end
+                endcase
+            end
 
+            // 모드 3: 빠른 깜빡임 (버튼 2)
+            MODE_FAST_BLINK: begin
+                // blink_on_off가 1이면 최대 밝기, 0이면 꺼짐
+                if(blink_on_off) begin
+                    case(color_sel)
+                        0: r_duty = 255; // Red
+                        1: g_duty = 255; // Green
+                        2: b_duty = 255; // Blue
+                        default: begin r_duty=0; g_duty=0; b_duty=0; end
+                    endcase
+                end
+                else begin
+                    r_duty = 0; g_duty = 0; b_duty = 0;
+                end
+            end
+        endcase
+    end
+    
+    pwm_Nfreq_Nstep led_pwm_red(.clk(clk), .reset_p(reset_p), .duty(r_duty), .pwm(led_r));
+    pwm_Nfreq_Nstep led_pwm_green(.clk(clk), .reset_p(reset_p), .duty(g_duty), .pwm(led_g));
+    pwm_Nfreq_Nstep led_pwm_blue(.clk(clk), .reset_p(reset_p), .duty(b_duty), .pwm(led_b));    
+endmodule
+
+module prototype_sensor_test(
+    input clk, reset_p,
+    inout dht11_data,
+    input echo,
+    output trig,
+    output [7:0] humidity, temperature,
+    output [8:0] distance_cm
+);
+
+    dht11_ctr dht(clk, reset_p, dht11_data, humidity, temperature);
+    
+    hc_sr04 ultra(.clk(clk), .reset_p(reset_p), .echo(echo),
+                  .trig(trig), .distance_cm(distance_cm));
+                  
+endmodule
 
 
 

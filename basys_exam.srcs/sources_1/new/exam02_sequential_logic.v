@@ -216,15 +216,15 @@ module ring_counter_led(
 endmodule
 
 module edge_detector_n(
-    input clk, reset,
+    input clk, reset_p,
     input cp,
     output p_edge, n_edge
 );
 
     reg ff_cur, ff_old;
 
-    always @(negedge clk, posedge reset)begin
-        if(reset)begin
+    always @(negedge clk, posedge reset_p)begin
+        if(reset_p)begin
             ff_cur <= 0;
             ff_old <= 0;
         end
@@ -241,15 +241,15 @@ module edge_detector_n(
 endmodule
 
 module edge_detector_p(
-    input clk, reset,
+    input clk, reset_p,
     input cp,
     output p_edge, n_edge
 );
 
     reg ff_cur, ff_old;
 
-    always @(posedge clk, posedge reset)begin
-        if(reset)begin
+    always @(posedge clk, posedge reset_p)begin
+        if(reset_p)begin
             ff_cur <= 0;
             ff_old <= 0;
         end
